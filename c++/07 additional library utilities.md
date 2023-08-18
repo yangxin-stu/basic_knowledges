@@ -83,3 +83,61 @@ string s {std::any_cast<string>(va[1])};
 ```
 
 ### tuples
+```cpp
+using myTuple = tuple<int, string, bool>;
+myTuple t1{11, "shasd"s, true};
+
+// get the value 
+cout << format("{}, {}, {}", get<0>(t1), get<1>(t1), get<2>(t1)) << endl;
+
+// get the type
+cout << format("type of t1<1> is: {}", typeid(get<1>(t1)).name()) << endl;
+
+// get tuple size or decltype(t1)
+cout << std::tuple_size<myTuple>::value << endl;
+
+double d1=11.0, d2=1123.0;
+string te{"fsad"s};
+tuple<int, double&, const double&, string&> t2{11, ref(d1), cref(d2), ref(te)}; // <functional>
+
+auto t2 { make_tuple(16, ref(d), cref(d), ref(str1)) };
+```
+
+### decompose tuples
+```cpp
+// 1. structured binging  can not ignore any elems
+tuple t1 {11, "hello"s, true}; 
+auto [i, str, b] {t1};
+// or 
+auto& [i2,str2, b2] {t1};
+
+// 2. using std::tie function and special value std::ignore
+int i3{0};
+bool b3{false};
+std::tie(i3, std::ignore, b3) = t1;
+```
+
+### concat and comparision
+```cpp
+tuple t1 { 16, "Test"s, true };
+tuple t2 { 3.14, "string 2"s };
+auto t3 { tuple_cat(t1, t2) };
+// comparision
+tuple t1 { 123, "def"s };
+tuple t2 { 123, "abc"s };
+if (t1 < t2) {
+    cout << "t1 < t2" << endl;
+} else {
+    cout << "t1 >= t2" << endl;
+}
+```
+
+### std::apply
+```cpp
+tuple t1 {1, 2};
+
+int add(int a, int b) {
+    return a+b;
+}
+int res {std::apply(add, t1)};
+```
