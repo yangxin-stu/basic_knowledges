@@ -85,15 +85,15 @@ VkPhysicalDevice physicalDevice,
 VkPhysicalDeviceProperties* pProperties);
 
 typedef struct VkPhysicalDeviceProperties {
-uint32_t apiVersion; // highest supported vulkan api version
-uint32_t driverVersion; // nvidia driver version ??
-uint32_t vendorID;
-uint32_t deviceID;
-VkPhysicalDeviceType deviceType;
-char deviceName[VK_MAX_PHYSICAL_DEVICE_NAME_SIZE];
-uint8_t pipelineCacheUUID[VK_UUID_SIZE]; // used for pipeline caching
-VkPhysicalDeviceLimits limits;
-VkPhysicalDeviceSparseProperties sparseProperties;
+    uint32_t apiVersion; // highest supported vulkan api version
+    uint32_t driverVersion; // nvidia driver version ??
+    uint32_t vendorID;
+    uint32_t deviceID;
+    VkPhysicalDeviceType deviceType;
+    char deviceName[VK_MAX_PHYSICAL_DEVICE_NAME_SIZE];
+    uint8_t pipelineCacheUUID[VK_UUID_SIZE]; // used for pipeline caching
+    VkPhysicalDeviceLimits limits;
+    VkPhysicalDeviceSparseProperties sparseProperties;
 } VkPhysicalDeviceProperties;
 
 // features 要使用的话需要在queue中明确指定 feature举例：各向异性过滤
@@ -120,8 +120,8 @@ typedef struct VkMemoryType {
 } VkMemoryType;
 
 typedef struct VkMemoryHeap {
-VkDeviceSize size;
-VkMemoryHeapFlags flags;
+    VkDeviceSize size;
+    VkMemoryHeapFlags flags;
 } VkMemoryHeap;
 
 
@@ -132,10 +132,10 @@ uint32_t* pQueueFamilyPropertyCount,
 VkQueueFamilyProperties* pQueueFamilyProperties);
 
 typedef struct VkQueueFamilyProperties {
-VkQueueFlags queueFlags; // capabilities of this queue family
-uint32_t queueCount; // nvidia 16
-uint32_t timestampValidBits;
-VkExtent3D minImageTransferGranularity;
+    VkQueueFlags queueFlags; // capabilities of this queue family
+    uint32_t queueCount; // nvidia 16
+    uint32_t timestampValidBits;
+    VkExtent3D minImageTransferGranularity;
 } VkQueueFamilyProperties;
 
 
@@ -148,26 +148,26 @@ VkDevice* pDevice);
 
 // device create info
 typedef struct VkDeviceCreateInfo {
-VkStructureType sType;
-const void* pNext;
-VkDeviceCreateFlags flags;
-uint32_t queueCreateInfoCount;
-const VkDeviceQueueCreateInfo* pQueueCreateInfos;
-uint32_t enabledLayerCount;
-const char* const* ppEnabledLayerNames;
-uint32_tenabledExtensionCount;
-const char* const* ppEnabledExtensionNames;
-const VkPhysicalDeviceFeatures* pEnabledFeatures;
+    VkStructureType sType;
+    const void* pNext;
+    VkDeviceCreateFlags flags;
+    uint32_t queueCreateInfoCount;
+    const VkDeviceQueueCreateInfo* pQueueCreateInfos;
+    uint32_t enabledLayerCount;
+    const char* const* ppEnabledLayerNames;
+    uint32_t enabledExtensionCount;
+    const char* const* ppEnabledExtensionNames;
+    const VkPhysicalDeviceFeatures* pEnabledFeatures;
 } VkDeviceCreateInfo;
 
 // queue create info
 typedef struct VkDeviceQueueCreateInfo {
-VkStructureType sType;
-const void* pNext;
-VkDeviceQueueCreateFlags flags;
-uint32_t queueFamilyIndex;
-uint32_t queueCount;
-const float* pQueuePriorities; // can set to nullptr
+    VkStructureType sType;
+    const void* pNext;
+    VkDeviceQueueCreateFlags flags;
+    uint32_t queueFamilyIndex;
+    uint32_t queueCount;
+    const float* pQueuePriorities; // can set to nullptr
 } VkDeviceQueueCreateInfo;
 ```
 
@@ -322,7 +322,7 @@ void* pMemory);
 2. `VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT`, `VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT`: the buffer can be used to back a uniform or storage texel buffer. Texel buffers are formatted arrays of texels that can be used as the source or destination (in the case of storage buffers) of reads and writes by shaders running on the device.
 3. `VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT`, `VK_BUFFER_USAGE_STORAGE_BUFFER_BIT`: back uniform or storage buffers.regular uniform and storage buffers have no format associated with them
 4. `VK_BUFFER_USAGE_INDEX_BUFFER_BIT`, `VK_BUFFER_USAGE_VERTEX_BUFFER_BIT`: store index or vertex buffer, drawing command
-5. `VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT`: store parameters used in indirect dispatch and drawing commands, which are commands that take their parameters directly from buffers rather than from your program. 
+5. `VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT`: store parameters used in indirect dispatch and drawing commands, which are commands that take their parameters directly from buffers rather than from your program. avert `GPU-CPU-GPU` round-trip
 
 #### sharing mode
 1. `VK_SHARING_MODE_EXCLUSIVE`: the buffer will only be used on a single queue. set this queue family ignored
@@ -330,6 +330,7 @@ void* pMemory);
 
 
 #### VkFormatFeatureFlagBits
+give you a VkFormat, they may be satisfied with:
 1. `VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT`: read-only images that will be sampled by shaders.
 2. `VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT`: Filter modes that include linear filtering may be used when this format is used for a sampled image.
 3. `VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT`: images that will be read and written by shaders
@@ -488,7 +489,7 @@ typedef struct VkSubresourceLayout {
 
 ### resource views
 1. function: partition them, reinterpret their content, or use them for multiple purposes
-2. category:Views of buffers, which represent a subrange of a buffer object, are known as` buffer views`, and views of images, which can alias formats or represent a subresource of another image, are known as `image views`.
+2. category: Views of buffers, which represent a subrange of a buffer object, are known as` buffer views`, and views of images, which can alias formats or represent a subresource of another image, are known as `image views`.
 3. `image view`: a collection of properties and a reference to a parent image resource.
 4. all images are essentially considered array images
 5. `image arrays`: we only refer to images with a `layerCount` greater than `1` as an array image. `cube map` . filtering cannot be performed across multiple layers in an array image. most Vulkan implementations will not allow you to create a 3D image with an arrayLayers field greater than 1.
