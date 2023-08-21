@@ -256,6 +256,7 @@ pair pair3 { 5, 10.10 }; // CTAD
 2. insertion, lookup, deletion are all based on `keys`
 3. A `map` keeps elements in `sorted` order, based on the `keys`, so that insertion, deletion, and lookup all take logarithmic time. 
 4. map stores `pair<key, value>` as elements.
+5. A `node handle` can only be moved and is the owner of the element stored in a node. It provides read/write access to both the key and the value.
 
 ```cpp
 map<string, int> m {
@@ -284,6 +285,66 @@ ret["sss"] = 4;
 for (auto iter{m.cbegin()}; iter != m.cend(); ++iter) {}
 
 // lookup elements
+m["hello"] = 4;
 
+auto it {m.find("world!")};
+if (it != std::end(m)) {
+    puts("found!");
+}
 
+auto isKeyInMap {m.contains("sss")}; // true
+
+// removing elems
+m.erase("sss");
+
+// node and node handles
+// extract
+map<string, int> m2 {
+    {"asdsf"s, 1},
+    {"s"s, 2}
+};
+
+auto extractedNode {m2.extract("s")};
+m2.insert(move(extractedNode));
+
+map<int, int> src { {1, 11}, {2, 22} };
+map<int, int> dst { {2, 22}, {3, 33}, {4, 44}, {5, 55} };
+dst.merge(src);
 ``` 
+
+### unordered associative containers
+```cpp
+class IntWrapper
+{
+public:
+    IntWrapper(int i): m_wrappedInt{i} {}
+    int getValue() const {return m_wrappedInt;}
+    bool operator==(const IntWrapper& rhs) const = default; // element-wise, sinec++20
+private:
+    int m_wrappedInt;
+};
+
+namespace std {
+    template <>
+    struct hash<IntWrapper> 
+    {
+        size_t operator()(const IntWrapper& x) const {
+            return std::hash<int>{}(x.getValue()); // construct a hash object(callable)
+        }
+    };
+}
+unordered_map<int, string> m {
+    {1, "Item 1"},
+    {2, "Item 2"},
+    {3, "Item 3"},
+    {4, "Item 4"}
+};
+// Using C++17 structured bindings.
+for (const auto& [key, value] : m) {
+    cout << format("{} = {}", key, value) << endl;
+}
+// Without structured bindings.
+for (const auto& p : m) {
+    cout << format("{} = {}", p.first, p.second) << endl;
+}
+```
