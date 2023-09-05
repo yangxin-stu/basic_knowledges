@@ -136,5 +136,49 @@ tbb::parallel_for(tbb::blocked_range2d<size_t>(0, n, 0, n),
 // 3d pages, rows, cols
 ```
 
+
 ## reduce and scan
 
+### example 1: reduce
+```cpp
+	// reduce
+	size_t n{ 1 << 10 };
+	float res{ 0.0f };
+	for (size_t i{ 0 }; i < n; ++i) {
+		res += std::sinf(i);
+	}
+
+	// paralled reduce
+	// 1. 8 threads
+	size_t maxt{ 8 };
+	std::vector<float> vec(maxt);
+	tbb::task_group tg;
+	for (size_t i{ 0 }; i < maxt; ++i) {
+		auto beg{ i * n / maxt };
+		auto end{ std::min(n, (i + 1) * n / maxt) };
+		tg.run([&, beg, end, i]() {
+			float temp{ 0.0f };
+			for (size_t j{ beg }; j < end; ++j) {
+				temp += std::sinf(j);
+			}
+			vec[i] = temp;
+			});
+	}
+
+	tg.wait();
+	
+	// 2. main thread adds these temps
+	float res2{ 0.0f };
+	for (size_t i{ 0 }; i < maxt; ++i) {
+		res2 += vec[i];
+	}
+	std::cout << res << '\t' << res2 << std::endl; // 0.0908415       0.0908408
+
+    float res{tbb::parallel_reduce(tbb::blocked_range<size_t>(0, n), (float)0, 
+	[&](tbb::blocked_range<size_t> r, float local_res) -> float {
+		for (size_t i{r.begin()}; i < r.end(); ++i) {
+			local_res += std::sinf(i);
+			}
+		return local_res;
+		}, [&](float x, float y) {return x + y; }) };
+```
