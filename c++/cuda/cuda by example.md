@@ -715,4 +715,12 @@ int main( void ) {
 3. The C library function `malloc()` allocates standard, pageable host memory, while `cudaHostAlloc()` allocates a buffer of page-locked host memory. Sometimes called pinned memory, page-locked buffers have an important property: The operating system guarantees us that it will never page this memory out to disk, which ensures its residency in physical memory. `cudaHostAllocDefault`
 4. `cudaFreeHost()`
 5. CUDA streams can play an important role in accelerating your applications. A cudA stream represents a queue of GPU operations that get executed in a specific order. We can add operations such as `kernel launches`, `memory copies`, and `event` starts and stops into a stream. The order in which operations are added to the stream specifies the order in which they will be executed. 
-6.  A GPU supporting `device overlap` possesses the capacity to simultaneously execute a CUDA C kernel while performing a copy between device and host memory. 
+6. A GPU supporting `device overlap` possesses the capacity to simultaneously execute a CUDA C kernel while performing a copy between device and host memory. 
+7. NVIDIA GPUs support simultaneous kernel execution and two memory copies. one to the device and one from the device
+
+
+### other topics
+1. Typically, our GPU accesses only GPU memory, and our CPU accesses only host memory. But in some circumstances, it’s better to break these rules.
+2. `cudaHostAllocWriteCombined`. This flag indicates that the runtime should allocate the buffer as write-combined with respect to the CPU cache. This flag will not change functionality in our application but represents an important performance enhancement for buffers that will be read only by the GPU. However, write-combined memory can be extremely inefficient in scenarios where the CPU also needs to perform reads from the buffer
+3.  we’ve allocated our host memory with the flag `cudaHostAllocMapped`, the buffers can be accessed from the GPU.
+
